@@ -1,0 +1,39 @@
+# --- DEPENDÊNCIAS (NPM) ---
+node_modules/
+package-lock.json
+npm-debug.log*
+clear-cache/
+
+# --- ARQUIVOS DE COMPILAÇÃO E BUILD ---
+dist/
+build/
+*.tsbuildinfo
+
+# --- BANCO DE DADOS E ORM (PRISMA) ---
+*.db
+*.db-journal
+/prisma/migrations/**/*.sql
+
+# --- CONFIGURAÇÕES E SEGURANÇA (DOTENV) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.sample
+!.env.example
+
+# --- LOGS DA APLICAÇÃO (PINO-PRETTY) ---
+logs/
+*.log
+
+# --- SISTEMA OPERACIONAL / EDITORES ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
