@@ -1,10 +1,9 @@
 import fastifyCors from "@fastify/cors";
 import fastifySwagger from "@fastify/swagger";
-import fastifySwaggerUi from "@fastify/swagger-ui";
+import fastifyApiReference from "@scalar/fastify-api-reference";
 import dotenv from "dotenv";
 import Fastify from "fastify";
 import {jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider} from "fastify-type-provider-zod";
-import z from "zod/v4";
 
 import {auth} from "./lib/auth.js";
 
@@ -34,31 +33,37 @@ await app.register(fastifySwagger, {
   transform: jsonSchemaTransform,
 });
 
-await app.register(fastifySwaggerUi, {
-  routePrefix: "/docs",
-});
-
 await app.register(fastifyCors, {
   origin: ["http://localhost:3000"],
   credentials: true,
 });
 
+await app.register(fastifyApiReference, {
+  routePrefix: "/docs",
+  configuration: {
+    sources: [
+      {
+        title: "Bootcamp Treinos API",
+        slug: "bootcamp-treinos-api",
+        url: "/swagger.json",
+      },
+      {
+        title: "Auth API",
+        slug: "auth-api",
+        url: "/api/auth/open-api/generate-schema",
+      },
+    ],
+  },
+});
+
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",
-  url: "/",
+  url: "/swagger.json",
   schema: {
-    description: "Hello World",
-    tags: ["hello"],
-    response: {
-      200: z.object({
-        message: z.string(),
-      }),
-    },
+    hide: true,
   },
-  handler: () => {
-    return {
-      message: "Hello World",
-    };
+  handler: async () => {
+    return app.swagger();
   },
 });
 
@@ -89,7 +94,7 @@ app.route({
       return reply.send(response.body ? await response.text() : null);
     } catch (error) {
       app.log.error(error);
-      return reply.status(500).send({
+      reply.status(500).send({
         error: "Internal authentication error",
         code: "AUTH_FAILURE",
       });
