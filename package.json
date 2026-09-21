@@ -28,7 +28,6 @@
   "dependencies": {
     "@fastify/cors": "^11.3.0",
     "@fastify/swagger": "^9.8.1",
-    "@fastify/swagger-ui": "^6.1.1",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "@scalar/fastify-api-reference": "^1.69.1",
