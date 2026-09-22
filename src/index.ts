@@ -57,7 +57,7 @@ await app.register(fastifyApiReference, {
 });
 
 // Routes
-await app.register(workoutPlanRoutes, {prefix: "/workout-plan"});
+await app.register(workoutPlanRoutes, {prefix: "/workout-plans"});
 
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",
