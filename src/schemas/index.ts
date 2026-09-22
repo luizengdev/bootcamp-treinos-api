@@ -7,6 +7,16 @@ export const ErrorSchema = z.object({
   code: z.string(),
 });
 
+export const UpdateWorkoutSessionSchema = z.object({
+  completedAt: z.string().datetime(),
+});
+
+export const WorkoutSessionSchema = z.object({
+  id: z.uuid(),
+  completedAt: z.string().datetime(),
+  startedAt: z.string().datetime(),
+});
+
 export const WorkoutPlanSchema = z.object({
   id: z.uuid(),
   name: z.string().trim().min(1),
