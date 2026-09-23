@@ -39,6 +39,22 @@ export const HomeDataSchema = z.object({
   ),
 });
 
+export const WorkoutPlanDetailsSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  workoutDays: z.array(
+    z.object({
+      id: z.uuid(),
+      weekDay: z.enum(WeekDay),
+      name: z.string(),
+      isRest: z.boolean(),
+      coverImageUrl: z.url().optional(),
+      estimatedDurationInSeconds: z.number().int(),
+      exercisesCount: z.number().int().min(0),
+    }),
+  ),
+});
+
 export const WorkoutPlanSchema = z.object({
   id: z.uuid(),
   name: z.string().trim().min(1),
