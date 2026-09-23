@@ -107,6 +107,56 @@ export const StatsSchema = z.object({
   totalTimeInSeconds: z.number().int().min(0),
 });
 
+export const ListWorkoutPlansQuerySchema = z.object({
+  active: z.stringbool({truthy: ["true"], falsy: ["false"]}).optional(),
+});
+
+export const WorkoutPlanListSchema = z.array(
+  z.object({
+    id: z.uuid(),
+    name: z.string(),
+    isActive: z.boolean(),
+    workoutDays: z.array(
+      z.object({
+        id: z.uuid(),
+        name: z.string(),
+        workoutPlanId: z.uuid(),
+        weekDay: z.enum(WeekDay),
+        isRest: z.boolean(),
+        estimatedDurationInSeconds: z.number().int(),
+        coverImageUrl: z.url().optional(),
+        exercises: z.array(
+          z.object({
+            id: z.uuid(),
+            name: z.string(),
+            order: z.number().int().min(0),
+            workoutDayId: z.uuid(),
+            sets: z.number().int(),
+            reps: z.number().int(),
+            restTimeInSeconds: z.number().int(),
+          }),
+        ),
+      }),
+    ),
+  }),
+);
+
+export const UpsertUserTrainDataSchema = z.object({
+  weightInGrams: z.number().int().positive(),
+  heightInCentimeters: z.number().int().positive(),
+  age: z.number().int().positive(),
+  bodyFatPercentage: z.number().int().min(0).max(100),
+});
+
+export const UserTrainDataSchema = z.object({
+  userId: z.string(),
+  userName: z.string(),
+  weightInGrams: z.number().int().min(0),
+  heightInCentimeters: z.number().int().min(0),
+  age: z.number().int().min(0),
+  bodyFatPercentage: z.number().int().min(0).max(100),
+});
+
 export const WorkoutPlanSchema = z.object({
   id: z.uuid(),
   name: z.string().trim().min(1),
