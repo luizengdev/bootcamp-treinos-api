@@ -1,0 +1,42 @@
+---
+description: Princípios de tipagem TypeScript, nomenclatura de arquivos e variáveis, uso da biblioteca dayjs para datas, arrow functions e validações avançadas com Zod v4.
+globs: "**/*.ts"
+alwaysApply: false
+---
+
+# Regras TypeScript
+
+## Princípios Básicos
+
+- **SEMPRE** use TypeScript para escrever código. Não use JavaScript em **hipótese alguma**.
+- **NUNCA** use `any`.
+- **SEMPRE** prefira named exports ao invés de default exports, a menos quando estritamente necessário.
+
+## Funções
+
+- **SEMPRE** use arrow functions ao invés de funções convencionais, a menos quando estritamente necessário.
+- **SEMPRE** nomeie funções como verbos.
+- **SEMPRE** prefira early returns ao invés de ifs muito aninhados.
+- Priorize usar higher-order functions ao invés de loops (map, filter, reduce etc.).
+- Ao receber mais de 2 parâmetros, **SEMPRE** receba um objeto.
+
+## Nomenclatura
+
+- **SEMPRE** prefira `interface` ao invés de `type`, a menos quando estritamente necessário.
+- **SEMPRE** use kebab-case para nomear arquivos (e.g ./lib/auth-client.ts) com exeção de use cases (use PascalCase).
+- **SEMPRE** use PascalCase para nomear classes.
+- **SEMPRE** use camelCase para nomear variáveis, funções e métodos.
+
+## Datas
+
+- SEMPRE use a biblioteca "dayjs" para manipular e formatar datas.
+
+## Validações com Zod
+
+- **SEMPRE** use Zod v4.
+- Busque sempre validar os dados de entrada com o Zod da forma mais estrita e semântica possível. Exemplo: use métodos nativos como `z.string().url()`, `z.date()`, etc.
+- **SEMPRE** use os validadores de formato ISO integrados do Zod v4 ao invés de construir regex manuais:
+  - `z.string().date()` para strings de datas puras (YYYY-MM-DD)
+  - `z.string().datetime()` para timestamps completos padrão ISO
+  - `z.string().time()` para horários simples
+  - `z.string().duration()` para durações estendidas

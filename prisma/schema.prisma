@@ -1,7 +1,8 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client"
@@ -13,17 +14,20 @@ datasource db {
 }
 
 model User {
-  id String @id
-
-  workoutPlans  WorkoutPlan[]
-  name          String
-  email         String
-  emailVerified Boolean       @default(false)
-  image         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  id                  String        @id
+  workoutPlans        WorkoutPlan[]
+  name                String
+  email               String
+  emailVerified       Boolean       @default(false)
+  image               String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  sessions            Session[]
+  accounts            Account[]
+  weightInGrams       Int?
+  heightInCentimeters Int?
+  age                 Int?
+  bodyFatPercentage   Int? // 100 representa 100% 
 
   @@unique([email])
   @@map("user")
@@ -33,12 +37,11 @@ model WorkoutPlan {
   id          String       @id @default(uuid())
   name        String
   userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   workoutDays WorkoutDay[]
   isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  createdAt   DateTime     @default(now()) @db.Timestamptz()
+  updatedAt   DateTime     @updatedAt @db.Timestamptz()
 }
 
 enum WeekDay {
@@ -55,28 +58,38 @@ model WorkoutDay {
   id                         String            @id @default(uuid())
   name                       String
   workoutPlanId              String
+  workoutPlan                WorkoutPlan       @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
   isRest                     Boolean           @default(false)
   weekDay                    WeekDay
   exercises                  WorkoutExercise[]
   estimatedDurationInSeconds Int
-  createdAt                  DateTime          @default(now())
-  updatedAt                  DateTime          @updatedAt
-
-  workoutPlan WorkoutPlan @relation(fields: [workoutPlanId], references: [id])
+  coverImageUrl              String?
+  createdAt                  DateTime          @default(now()) @db.Timestamptz()
+  updatedAt                  DateTime          @updatedAt @db.Timestamptz()
+  sessions                   WorkoutSession[]
 }
 
 model WorkoutExercise {
-  id                String   @id @default(uuid())
-  order             Int
+  id                String     @id @default(uuid())
   name              String
+  order             Int
+  workoutDayId      String
+  workoutDay        WorkoutDay @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
   sets              Int
   reps              Int
   restTimeInSeconds Int
-  workoutDayId      String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime   @default(now()) @db.Timestamptz()
+  updatedAt         DateTime   @updatedAt @db.Timestamptz()
+}
 
-  workoutDay WorkoutDay @relation(fields: [workoutDayId], references: [id])
+model WorkoutSession {
+  id           String     @id @default(uuid())
+  workoutDayId String
+  workoutDay   WorkoutDay @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
+  startedAt    DateTime   @db.Timestamptz()
+  completedAt  DateTime?  @db.Timestamptz()
+  createdAt    DateTime   @default(now()) @db.Timestamptz()
+  updatedAt    DateTime   @updatedAt @db.Timestamptz()
 }
 
 model Session {
