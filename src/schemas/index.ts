@@ -8,13 +8,103 @@ export const ErrorSchema = z.object({
 });
 
 export const UpdateWorkoutSessionSchema = z.object({
-  completedAt: z.string().datetime(),
+  completedAt: z.iso.datetime(),
 });
 
 export const WorkoutSessionSchema = z.object({
   id: z.uuid(),
-  completedAt: z.string().datetime(),
-  startedAt: z.string().datetime(),
+  completedAt: z.iso.datetime(),
+  startedAt: z.iso.datetime(),
+});
+
+export const HomeDataSchema = z.object({
+  activeWorkoutPlanId: z.uuid(),
+  todayWorkoutDay: z.object({
+    workoutPlanId: z.uuid(),
+    id: z.uuid(),
+    name: z.string(),
+    isRest: z.boolean(),
+    weekDay: z.enum(WeekDay),
+    estimatedDurationInSeconds: z.number().int(),
+    coverImageUrl: z.url().optional(),
+    exercisesCount: z.number().int().min(0),
+  }),
+  workoutStreak: z.number().int().min(0),
+  consistencyByDay: z.record(
+    z.iso.date(),
+    z.object({
+      workoutDayCompleted: z.boolean(),
+      workoutDayStarted: z.boolean(),
+    }),
+  ),
+});
+
+export const WorkoutPlanDetailsSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  workoutDays: z.array(
+    z.object({
+      id: z.uuid(),
+      weekDay: z.enum(WeekDay),
+      name: z.string(),
+      isRest: z.boolean(),
+      coverImageUrl: z.url().optional(),
+      estimatedDurationInSeconds: z.number().int(),
+      exercisesCount: z.number().int().min(0),
+    }),
+  ),
+});
+
+export const WorkoutDayDetailsSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  isRest: z.boolean(),
+  coverImageUrl: z.url().optional(),
+  estimatedDurationInSeconds: z.number().int(),
+  exercises: z.array(
+    z.object({
+      id: z.uuid(),
+      name: z.string(),
+      order: z.number().int().min(0),
+      workoutDayId: z.uuid(),
+      sets: z.number().int(),
+      reps: z.number().int(),
+      restTimeInSeconds: z.number().int(),
+    }),
+  ),
+  weekDay: z.enum(WeekDay),
+  sessions: z.array(
+    z.object({
+      id: z.uuid(),
+      workoutDayId: z.uuid(),
+      startedAt: z.iso.date().optional(),
+      completedAt: z.iso.date().optional(),
+    }),
+  ),
+});
+
+export const GetStatsQuerySchema = z
+  .object({
+    from: z.iso.date(),
+    to: z.iso.date(),
+  })
+  .refine((query) => query.from <= query.to, {
+    message: "'from' must be before or equal to 'to'",
+    path: ["from"],
+  });
+
+export const StatsSchema = z.object({
+  workoutStreak: z.number().int().min(0),
+  consistencyByDay: z.record(
+    z.iso.date(),
+    z.object({
+      workoutDayCompleted: z.boolean(),
+      workoutDayStarted: z.boolean(),
+    }),
+  ),
+  completedWorkoutsCount: z.number().int().min(0),
+  conclusionRate: z.number().min(0).max(1),
+  totalTimeInSeconds: z.number().int().min(0),
 });
 
 export const WorkoutPlanSchema = z.object({
