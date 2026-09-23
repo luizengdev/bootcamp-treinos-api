@@ -83,6 +83,30 @@ export const WorkoutDayDetailsSchema = z.object({
   ),
 });
 
+export const GetStatsQuerySchema = z
+  .object({
+    from: z.iso.date(),
+    to: z.iso.date(),
+  })
+  .refine((query) => query.from <= query.to, {
+    message: "'from' must be before or equal to 'to'",
+    path: ["from"],
+  });
+
+export const StatsSchema = z.object({
+  workoutStreak: z.number().int().min(0),
+  consistencyByDay: z.record(
+    z.iso.date(),
+    z.object({
+      workoutDayCompleted: z.boolean(),
+      workoutDayStarted: z.boolean(),
+    }),
+  ),
+  completedWorkoutsCount: z.number().int().min(0),
+  conclusionRate: z.number().min(0).max(1),
+  totalTimeInSeconds: z.number().int().min(0),
+});
+
 export const WorkoutPlanSchema = z.object({
   id: z.uuid(),
   name: z.string().trim().min(1),
