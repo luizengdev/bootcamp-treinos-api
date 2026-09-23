@@ -8,13 +8,13 @@ export const ErrorSchema = z.object({
 });
 
 export const UpdateWorkoutSessionSchema = z.object({
-  completedAt: z.string().datetime(),
+  completedAt: z.iso.datetime(),
 });
 
 export const WorkoutSessionSchema = z.object({
   id: z.uuid(),
-  completedAt: z.string().datetime(),
-  startedAt: z.string().datetime(),
+  completedAt: z.iso.datetime(),
+  startedAt: z.iso.datetime(),
 });
 
 export const WorkoutPlanSchema = z.object({

@@ -36,7 +36,8 @@ alwaysApply: false
 - **SEMPRE** use Zod v4.
 - Busque sempre validar os dados de entrada com o Zod da forma mais estrita e semântica possível. Exemplo: use métodos nativos como `z.string().url()`, `z.date()`, etc.
 - **SEMPRE** use os validadores de formato ISO integrados do Zod v4 ao invés de construir regex manuais:
-  - `z.string().date()` para strings de datas puras (YYYY-MM-DD)
-  - `z.string().datetime()` para timestamps completos padrão ISO
-  - `z.string().time()` para horários simples
-  - `z.string().duration()` para durações estendidas
+  - `z.iso.date()` para strings de datas puras (YYYY-MM-DD)
+  - `z.iso.datetime()` para timestamps completos padrão ISO
+  - `z.iso.time()` para horários simples
+  - `z.iso.duration()` para durações estendidas
+- **NUNCA** use os formatos depreciados `z.string().date()`, `z.string().datetime()`, `z.string().time()` e `z.string().duration()`.
