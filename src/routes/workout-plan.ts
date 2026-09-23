@@ -12,15 +12,18 @@ import {
 import {auth} from "../lib/auth.js";
 import {
   ErrorSchema,
+  ListWorkoutPlansQuerySchema,
   UpdateWorkoutSessionSchema,
   WorkoutDayDetailsSchema,
   WorkoutPlanDetailsSchema,
+  WorkoutPlanListSchema,
   WorkoutPlanSchema,
   WorkoutSessionSchema,
 } from "../schemas/index.js";
 import {CreateWorkoutPlan} from "../usecases/CreateWorkoutPlan.js";
 import {GetWorkoutDay} from "../usecases/GetWorkoutDay.js";
 import {GetWorkoutPlan} from "../usecases/GetWorkoutPlan.js";
+import {ListWorkoutPlans} from "../usecases/ListWorkoutPlans.js";
 import {StartWorkoutSession} from "../usecases/StartWorkoutSession.js";
 import {UpdateWorkoutSession} from "../usecases/UpdateWorkoutSession.js";
 
@@ -216,7 +219,7 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
     url: "/:workoutPlanId",
     schema: {
       tags: ["Workout Plan"],
-      summary: "Get a workout plan with its days",
+      summary: "Get a workout plan",
       params: z.object({
         workoutPlanId: z.uuid(),
       }),
@@ -273,7 +276,7 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
     url: "/:workoutPlanId/days/:workoutDayId",
     schema: {
       tags: ["Workout Plan"],
-      summary: "Get a workout day with its exercises and sessions",
+      summary: "Get a workout day",
       params: z.object({
         workoutPlanId: z.uuid(),
         workoutDayId: z.uuid(),
@@ -319,6 +322,47 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
             code: "FORBIDDEN",
           });
         }
+        return reply.status(500).send({
+          error: "Internal server error",
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+    },
+  });
+
+  app.withTypeProvider<ZodTypeProvider>().route({
+    method: "GET",
+    url: "/",
+    schema: {
+      tags: ["Workout Plan"],
+      summary: "List workout plans",
+      querystring: ListWorkoutPlansQuerySchema,
+      response: {
+        200: WorkoutPlanListSchema,
+        400: ErrorSchema,
+        401: ErrorSchema,
+        500: ErrorSchema,
+      },
+    },
+    handler: async (request, reply) => {
+      try {
+        const session = await auth.api.getSession({
+          headers: fromNodeHeaders(request.headers),
+        });
+        if (!session) {
+          return reply.status(401).send({
+            error: "Unauthorized",
+            code: "UNAUTHORIZED",
+          });
+        }
+        const listWorkoutPlans = new ListWorkoutPlans();
+        const result = await listWorkoutPlans.execute({
+          userId: session.user.id,
+          active: request.query.active,
+        });
+        return reply.status(200).send(result);
+      } catch (error) {
+        app.log.error(error);
         return reply.status(500).send({
           error: "Internal server error",
           code: "INTERNAL_SERVER_ERROR",
