@@ -1,6 +1,6 @@
 import z from "zod";
 
-import {WeekDay} from "../generated/prisma/enums.js";
+import { WeekDay } from "../generated/prisma/enums.js";
 
 export const ErrorSchema = z.object({
   error: z.string(),
@@ -108,7 +108,7 @@ export const StatsSchema = z.object({
 });
 
 export const ListWorkoutPlansQuerySchema = z.object({
-  active: z.stringbool({truthy: ["true"], falsy: ["false"]}).optional(),
+  active: z.stringbool({ truthy: ["true"], falsy: ["false"] }).optional(),
 });
 
 export const WorkoutPlanListSchema = z.array(
@@ -140,6 +140,18 @@ export const WorkoutPlanListSchema = z.array(
     ),
   }),
 );
+
+export const AiChatSchema = z.object({
+  messages: z
+    .array(
+      z.looseObject({
+        id: z.string(),
+        role: z.enum(["system", "user", "assistant"]),
+        parts: z.array(z.looseObject({ type: z.string() })),
+      }),
+    )
+    .min(1),
+});
 
 export const UpsertUserTrainDataSchema = z.object({
   weightInGrams: z.number().int().positive(),
