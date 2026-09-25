@@ -97,8 +97,9 @@ export const aiRoutes = async (app: FastifyInstance) => {
           messages: request.body.messages,
         });
         const result = streamText({
-          model: google("gemini-3.8-flash"),
+          model: google("gemini-3.6-flash"),
           instructions: SYSTEM_PROMPT,
+          stopWhen: stepCountIs(10),
           tools: {
             getUserTrainData: tool({
               description:
@@ -180,7 +181,6 @@ export const aiRoutes = async (app: FastifyInstance) => {
               },
             }),
           },
-          stopWhen: stepCountIs(5),
           messages: await convertToModelMessages(messages),
         });
         const response = createUIMessageStreamResponse({
