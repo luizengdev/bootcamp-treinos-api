@@ -1,31 +1,31 @@
 FROM node:24-slim AS base
 
-ENV NPM_HOME="/npm"
-ENV PATH="$NPM_HOME:$PATH"
-
-RUN corepack enable && corepack prepare npm@11.16.0 --activate
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY package.json npm-lock.yaml ./
+COPY package.json package-lock.json ./
 COPY prisma ./prisma/
+COPY prisma7.config.ts ./
 
 # ------- Dependencies -------
 FROM base AS deps
 
-RUN npm install --frozen-lockfile
+RUN npm ci
 
 # ------- Build -------
 FROM deps AS build
 
 COPY . .
-
-RUN npm run build && cp -r src/generated dist/generated
+    
+RUN npx prisma generate --config prisma7.config.ts && npm run build
 
 # ------- Production -------
 FROM base AS production
 
-RUN npm install --frozen-lockfile --prod --ignore-scripts
+ENV NODE_ENV=production
+
+RUN npm ci --omit=dev --ignore-scripts
 
 COPY --from=build /app/dist ./dist
 
